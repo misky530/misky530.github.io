@@ -1,0 +1,8 @@
+{
+  "label": "Kafka",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Apache Kafka documentation and tutorials."
+  }
+}
