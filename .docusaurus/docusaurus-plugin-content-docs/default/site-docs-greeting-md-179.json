@@ -1,0 +1,22 @@
+{
+  "id": "greeting",
+  "title": "Hello from Docusaurus",
+  "description": "Create a doc page with rich content.",
+  "source": "@site/docs/greeting.md",
+  "sourceDirName": ".",
+  "slug": "/greeting",
+  "permalink": "/docs/greeting",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/misky530/misky530.github.io/tree/main/docs/greeting.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "description": "Create a doc page with rich content."
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Introduction",
+    "permalink": "/docs/kafka/Introduction"
+  }
+}

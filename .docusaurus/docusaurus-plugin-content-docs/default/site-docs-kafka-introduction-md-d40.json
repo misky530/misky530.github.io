@@ -1,0 +1,28 @@
+{
+  "id": "kafka/Introduction",
+  "title": "Introduction",
+  "description": "This is a Kafka introduction.",
+  "source": "@site/docs/kafka/Introduction.md",
+  "sourceDirName": "kafka",
+  "slug": "/kafka/Introduction",
+  "permalink": "/docs/kafka/Introduction",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/misky530/misky530.github.io/tree/main/docs/kafka/Introduction.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1,
+    "title": "Introduction"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Kafka",
+    "permalink": "/docs/category/kafka"
+  },
+  "next": {
+    "title": "Hello from Docusaurus",
+    "permalink": "/docs/greeting"
+  }
+}
