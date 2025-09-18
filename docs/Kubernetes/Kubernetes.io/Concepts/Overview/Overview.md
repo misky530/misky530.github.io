@@ -88,4 +88,54 @@ Kubernetes provides you with:
   可扩展性设计 ,无需修改上流源代码给你的Kubernetes集群增加功能
   ```
 
-  
+## What Kubernetes is not
+
+Kubernetes is not a traditional, all-inclusive PaaS (Platform as a Service) system. Since Kubernetes operates at the container level rather than at the hardware level, it provides some generally applicable features common to PaaS offerings, such as deployment, scaling, load balancing, and lets users integrate their logging, monitoring, and alerting solutions. However, Kubernetes is not monolithic, and these default solutions are optional and pluggable. Kubernetes provides the building blocks for building developer platforms, but preserves user choice and flexibility where it is important.
+
+```
+Kubernetes不是一个传统的,包罗所有的PaaS的系统.由于Kubernetes是在容器级别而不是硬件级别,它提供了一些PaaS的常用功能,比如发布,弹性伸缩,负载均衡,并且让用户集成他们的日志,监控,和告警的解决方案.然而,Kubernetes并非单体式架构, 这些默认解决方案是可选和可插拨的.Kubernetes提供了构建开发者平台的构建基石,但在重要的地方保留了用户的选择和灵活性.
+```
+
+  Kubernetes:
+
+  - Does not limit the types of applications supported. Kubernetes aims to support an extremely diverse variety of workloads, including stateless, stateful, and data-processing workloads. If an application can run in a container, it should run great on Kubernetes.
+
+    ```
+    不能限制支持的应用程序类型,Kubernetes支持极其多样的工作负载, 包括有状态,无状态和数据处理工作负载,如果一个应用能在容器中运行,那么它就能在Kubernetes中运行得很好.
+    ```
+
+  - Does not deploy source code and does not build your application. Continuous Integration, Delivery, and Deployment (CI/CD) workflows are determined by organization cultures and preferences as well as technical requirements.
+
+  - ```
+    不发布代码也不构建应用程序, 持续集成,交付,CICD工作流等取决组织的文化,偏好和技术要求
+    ```
+
+  - Does not provide application-level services, such as middleware (for example, message buses), data-processing frameworks (for example, Spark), databases (for example, MySQL), caches, nor cluster storage systems (for example, Ceph) as built-in services. Such components can run on Kubernetes, and/or can be accessed by applications running on Kubernetes through portable mechanisms, such as the [Open Service Broker](https://openservicebrokerapi.org/).
+
+    ```
+    不提供应用程序层面的服务作为内置服务,比如中间件(消息总线),数据处理框架(spark),数据库(mysql),缓存或者集群存储系统(Ceph),这些组件能在Kubernetes运行, 并且/或者由Kubernetes运行的可移植机制来访问,比如 Open Service Broker
+    ```
+
+  - Does not dictate logging, monitoring, or alerting solutions. It provides some integrations as proof of concept, and mechanisms to collect and export metrics.
+
+    ```
+    不指定日志,监控和告警解决方案, 它提供了一些集成作为概念验证,以及收集和导出机制
+    ```
+
+  - Does not provide nor mandate a configuration language/system (for example, Jsonnet). It provides a declarative API that may be targeted by arbitrary forms of declarative specifications.
+
+    ```
+    不提供也不强制要求配置语言/系统(Jsonnet),它提供了一个声明式的api,可以通过任意形式来指定规范
+    ```
+
+  - Does not provide nor adopt any comprehensive machine configuration, maintenance, management, or self-healing systems.
+
+    ```
+    不提供也不采用任何全面的机器配置,维护,管理 和自我修复系统.
+    ```
+
+  - Additionally, Kubernetes is not a mere orchestration system. In fact, it eliminates the need for orchestration. The technical definition of orchestration is execution of a defined workflow: first do A, then B, then C. In contrast, Kubernetes comprises a set of independent, composable control processes that continuously drive the current state towards the provided desired state. It shouldn't matter how you get from A to C. Centralized control is also not required. This results in a system that is easier to use and more powerful, robust, resilient, and extensible.
+
+    ```
+    此外, Kubernetes不仅仅是一个编排系统,事实上, 它消除了编排.预定的工作流执行指定了编排的技术定义,什么时候做A,什么时候做B,做C等.相比之下,Kubernetes包含一套独立的,可组合的流程持续推动当前状态往期望状态发展.如何从A到C并不重要, 中央控制也不是需要的, 这使得系统更加易手,更强大,更稳定,更有弹性也更有可扩展性.
+    ```
