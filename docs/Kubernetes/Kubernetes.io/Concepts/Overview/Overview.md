@@ -152,6 +152,10 @@ Let's take a look at why Kubernetes is so useful by going back in time.
 
 Early on, organizations ran applications on physical servers. There was no way to define resource boundaries for applications in a physical server, and this caused resource allocation issues. For example, if multiple applications run on a physical server, there can be instances where one application would take up most of the resources, and as a result, the other applications would underperform. A solution for this would be to run each application on a different physical server. But this did not scale as resources were underutilized, and it was expensive for organizations to maintain many physical servers.
 
+```
+传统发布时代, 在早期, 组织在物理服务器上运行程序,这没办法为物理服务器上的应用定义绑定资源,导致了资源分配的问题.比如, 假如有多个应用在物理服务器上运行,在某些情况下,如果其中一个应用占用了大量的资源,结果就是其他应用程序就会表现不佳, 一个解决方案就是将不同的应用运行在不同的物理服务器上.但是这样并不能扩展,因为资源将不会充分被利用, 这对于组织来管理如此多的物理服务器来说是很昂贵的.
+```
+
 **Virtualized deployment era:**
 
 As a solution, virtualization was introduced. It allows you to run multiple Virtual Machines (VMs) on a single physical server's CPU. Virtualization allows applications to be isolated between VMs and provides a level of security as the information of one application cannot be freely accessed by another application.
@@ -159,6 +163,11 @@ As a solution, virtualization was introduced. It allows you to run multiple Virt
 Virtualization allows better utilization of resources in a physical server and allows better scalability because an application can be added or updated easily, reduces hardware costs, and much more. With virtualization you can present a set of physical resources as a cluster of disposable virtual machines.
 
 Each VM is a full machine running all the components, including its own operating system, on top of the virtualized hardware.
+
+```
+作为一个解决方案,引入虚拟化. 它允许你在单独物理机上的CPU运行多个VMs, 虚拟化允许应用程序在虚拟机之间隔离,并提供一定程度的安全性,因为一个应用程序的信息不能被另外一个应用程序访问.
+虚拟化允许物理机有更好的资源利用率和更好的弹性伸缩,因为应用程序更加轻松的增加或者更新, 减少硬件的费用等等. 通过虚拟化,您能将一组物理资源呈现为一次性虚拟机集群.
+```
 
 **Container deployment era:**
 
