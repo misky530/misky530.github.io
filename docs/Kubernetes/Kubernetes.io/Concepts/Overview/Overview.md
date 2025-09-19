@@ -176,12 +176,39 @@ Containers are similar to VMs, but they have relaxed isolation properties to sha
 Containers have become popular because they provide extra benefits, such as:
 
 - Agile application creation and deployment: increased ease and efficiency of container image creation compared to VM image use.
+
 - Continuous development, integration, and deployment: provides for reliable and frequent container image build and deployment with quick and efficient rollbacks (due to image immutability).
+
 - Dev and Ops separation of concerns: create application container images at build/release time rather than deployment time, thereby decoupling applications from infrastructure.
+
 - Observability: not only surfaces OS-level information and metrics, but also application health and other signals.
+
 - Environmental consistency across development, testing, and production: runs the same on a laptop as it does in the cloud.
+
 - Cloud and OS distribution portability: runs on Ubuntu, RHEL, CoreOS, on-premises, on major public clouds, and anywhere else.
+
 - Application-centric management: raises the level of abstraction from running an OS on virtual hardware to running an application on an OS using logical resources.
+
 - Loosely coupled, distributed, elastic, liberated micro-services: applications are broken into smaller, independent pieces and can be deployed and managed dynamically – not a monolithic stack running on one big single-purpose machine.
+
 - Resource isolation: predictable application performance.
+
 - Resource utilization: high efficiency and density
+
+  ```
+  容器部署时代,容器类似VMs,但他们有宽松的隔离属性在应用程序中共享OS.因此容器被认为是轻量的, 与虚拟机类似,容器有它自己的文件系统,共享CPU内存,进程空间等等.因此它们与底层基础架构解耦,所它们在跨云平台和操作系统的发行版中是可移植的.
+  容器化这所以变得如此流行是因为提供了下面的一些能力,比如:
+  - 敏捷应用的创建和部署: 和VM相比之下,容器化在容器镜像创建时更加便捷和高效
+  - 持续部署,集成和部署: 提供更加可靠和频繁的容器镜像构建和部署并提供更快和高效的回滚(得益于镜像的不变性)
+  - 研发和运维关注点分享: 在构建/发布时创建应用程序容器镜像(并不是在部署时),从而将应用程序从基础设施中解耦
+  - 可观察性: 不可以显示系统层面的信息和指标,还可以显示应用程序的健康指标和其它信号
+  - 开发,测试,产品环境的一致性. 在云中和笔记本电脑中都是运行一致
+  - 云端和操作系统发行版的可移植性: 可以运行在Ubuntu,RHEL,CoreOS,私有化部署和主流的公有云上,其他任何地方都是如此.
+  - 以应用程序为中心管理: 将抽象级别从虚拟机中运行操作系统提升到从逻辑资源中运行操作系统
+  - 松散耦合,分布式,弹性,自由微服务: 应用程序被分解为更小,更独立的单独,并能动态部署和管理-并不是大型单独机器上运行单体堆栈
+  - 资源隔离: 可预测的应用程序性能
+  - 资源分配: 高效和高密度
+  
+  ```
+  
+  
