@@ -140,4 +140,10 @@ The `kubectl` tool uses the `--validate` flag to set the level of field validati
 
 When `kubectl` cannot connect to an API server that supports field validation it will fall back to using client-side validation. Kubernetes 1.27 and later versions always offer field validation; older Kubernetes releases might not. If your cluster is older than v1.27, check the documentation for your version of Kubernetes.
 
+```
+从Kubernetes v1.25开始, api sever提供服务端字段验证用于检测未识别的重复的字段在对象中.它提供了kubectl --validate在服务端中
+```
+
+
+
 ## 
