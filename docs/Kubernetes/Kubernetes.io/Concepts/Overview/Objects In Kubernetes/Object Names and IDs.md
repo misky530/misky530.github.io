@@ -12,8 +12,6 @@ For non-unique user-provided attributes, Kubernetes provides [labels](https://ku
 对于非唯一的用户提供的属性,Kubernetes提供了lables和注释
 ```
 
-
-
 ## Names
 
 A client-provided string that refers to an object in a [resource](https://kubernetes.io/docs/reference/using-api/api-concepts/#standard-api-terminology) URL, such as `/api/v1/pods/some-name`.
