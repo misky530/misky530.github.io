@@ -73,4 +73,4 @@ You can use field selectors across multiple resource types. This `kubectl` comma
 kubectl get statefulsets,services --all-namespaces --field-selector metadata.namespace!=default
 ```
 
-## Fee
+## 
