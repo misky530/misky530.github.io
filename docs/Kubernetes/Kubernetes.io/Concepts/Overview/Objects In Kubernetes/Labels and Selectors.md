@@ -66,6 +66,26 @@ Valid label value:
 
 For example, here's a manifest for a Pod that has two labels `environment: production` and `app: nginx`:
 
+```
+*标签*是键值对。有效的标签键由两部分组成：可选的前缀和名称，两者以斜杠（`/`）分隔。名称部分为必填项，长度不得超过63个字符，且必须以字母数字字符（`[a-z0-9A-Z]`）开头和结尾，中间可包含连字符（`-`）、下划线（`_`）、点号（`.`）及字母数字字符。前缀为可选项。若指定前缀，则必须为DNS子域：由点号（`.`）分隔的DNS标签序列，总长不超过253个字符，后接斜杠（`/`）。
+
+若省略前缀，则标签键默认为用户私有。自动系统组件（如`kube-scheduler`、`kube-controller-manager`、`kube-apiserver`、`kubectl`或其他第三方自动化工具）向终端用户对象添加标签时必须指定前缀。
+
+`kubernetes.io/` 和 `k8s.io/` 前缀为 Kubernetes 核心组件[保留](https://kubernetes.io/docs/reference/labels-annotations-taints/)。
+
+有效标签值要求：
+
+- 总长度不超过 63 个字符（可为空）
+- 非空时首尾必须为字母数字字符（`[a-z0-9A-Z]`），
+- 中间可包含连字符（`-`）、下划线（`_`）、点号（`.`）及字母数字字符。
+
+例如，以下是具有两个标签 `environment: production` 和 `app: nginx` 的 Pod 配置文件：
+
+通过DeepL.com（免费版）翻译
+```
+
+
+
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -100,6 +120,23 @@ For some API types, such as ReplicaSets, the label selectors of two instances mu
 
 For both equality-based and set-based conditions there is no logical *OR* (`||`) operator. Ensure your filter statements are structured accordingly.
 
+```
+Label selectors
+不同于名称和UID, 标签不需要唯一性, 通常我们期望多个对象有着同样的标签.
+通过一个标签选择器,客户端和用户可以获取一组对象的集合. 在Kubernetes中标签选择器是核心的分组原语
+API目前支持两种类型的选择器,基于等式和基于集合.一个标签选择器可以有多个需求,使用逗号分开. 在多需求中, 所有的标签必须全部满足,相当于逻辑比较符 &&
+空或者未提供的选择器语义依赖于上下文. API类型在使用选择器时应该将验证和它们的意义文档化.
+
+Note:
+有一些API的类型,比如ReplicaSet, 在同一个namespace中两个实例的标签选择器不能重叠,控制器视为指令冲突,从而无法确实要产生的副本数量
+
+Caution:
+基于等式或者基于集合的条件中两者都不存在于逻辑 OR的条件. 确实你的筛选语句结构符合此要求.
+
+```
+
+
+
 ### *Equality-based* requirement
 
 *Equality-* or *inequality-based* requirements allow filtering by label keys and values. Matching objects must satisfy all of the specified label constraints, though they may have additional labels as well. Three kinds of operators are admitted `=`,`==`,`!=`. The first two represent *equality* (and are synonyms), while the latter represents *inequality*. For example:
@@ -112,6 +149,21 @@ tier != frontend
 The former selects all resources with key equal to `environment` and value equal to `production`. The latter selects all resources with key equal to `tier` and value distinct from `frontend`, and all resources with no labels with the `tier` key. One could filter for resources in `production` excluding `frontend` using the comma operator: `environment=production,tier!=frontend`
 
 One usage scenario for equality-based label requirement is for Pods to specify node selection criteria. For example, the sample Pod below selects nodes where the `accelerator` label exists and is set to `nvidia-tesla-p100`.
+
+````
+*基于相等性*或*基于不等性*的要求允许通过标签键值进行过滤。匹配对象必须满足所有指定的标签约束，但也可附加其他标签。支持三种运算符：`=`、`==`、`!=`。前两者表示*相等性*（且为同义词），后者表示*不等性*。例如：
+
+```
+环境 = 生产环境
+层级 != 前端
+```
+
+前者筛选所有键值为 `环境` 且值为 `生产环境` 的资源。后者筛选所有键值为 `层级` 但值不同于 `前端` 的资源，以及所有未携带 `层级` 键的资源。若需筛选`production`环境中排除`frontend`的资源，可使用逗号运算符：`environment=production,tier!=frontend`
+
+基于等值的标签要求常用于Pod节点选择策略。例如下例Pod仅选择存在`accelerator`标签且值为`nvidia-tesla-p100`的节点：
+````
+
+
 
 ```yaml
 apiVersion: v1
@@ -148,6 +200,30 @@ partition
 Similarly the comma separator acts as an *AND* operator. So filtering resources with a `partition` key (no matter the value) and with `environment` different than `qa` can be achieved using `partition,environment notin (qa)`. The *set-based* label selector is a general form of equality since `environment=production` is equivalent to `environment in (production)`; similarly for `!=` and `notin`.
 
 *Set-based* requirements can be mixed with *equality-based* requirements. For example: `partition in (customerA, customerB),environment!=qa`.
+
+````
+基于集合的标签要求允许根据一组值过滤键。支持三种运算符：`in`、`notin` 和 `exists`（仅限键标识符）。例如：
+
+```
+environment in (production, qa)
+tier notin (frontend, backend)
+partition
+!partition
+```
+
+- 首例选择所有具有 `environment` 键且值为 `production` 或 `qa` 的资源。
+- 次例选择所有具有 `tier` 键且值非 `frontend` 或 `backend` 的资源，以及所有未携带 `tier` 键标签的资源。
+- 第三例选择所有包含 `partition` 键标签的资源；不检查具体值。
+- 第四例选择所有不包含`partition`标签的资源；不检查具体值。
+
+同样地，逗号分隔符充当*AND*运算符。因此，通过`partition,environment notin (qa)`可实现同时筛选包含`partition`标签（无论值为何）且`environment`不同于`qa`的资源。基于集合的标签选择器本质上是等值运算的通用形式，因为`environment=production`等同于`environment in (production)`；`!=`和`notin`运算符亦遵循此原理。
+
+集合型条件可与等值型条件混合使用。例如：`partition in (customerA, customerB),environment!=qa`。
+
+通过DeepL.com（免费版）翻译
+````
+
+
 
 ## API
 
