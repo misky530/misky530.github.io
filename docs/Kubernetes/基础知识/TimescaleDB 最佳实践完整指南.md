@@ -186,7 +186,7 @@ SELECT add_retention_policy('iot_sensor_data',
 100 GB           230 GB (压缩前2.3TB)  60 GB (压缩前300GB)  50 GB
 
 查询延迟:
-< 100ms          < 500ms            < 1s              < 100ms
+\< 100ms          \< 500ms            \< 1s              \< 100ms
 
 存储成本(相对):
 10                5                  2                 1
@@ -256,7 +256,7 @@ GROUP BY bucket;
 ```sql
 -- ✅ 正确:时间范围查询自动裁剪无关 Chunk
 SELECT * FROM iot_sensor_data
-WHERE time = '2025-10-01' AND time < '2025-10-02';
+WHERE time = '2025-10-01' AND time \< '2025-10-02';
 -- 只扫描 2025-10-01 的 Chunk
 
 -- ❌ 错误:不指定时间范围,全表扫描
@@ -561,7 +561,7 @@ pg_stat_statements_calls{query=~".*FROM iot_sensor_data.*"}
 - alert: LowCacheHitRate
   expr: |
     (sum(pg_stat_database_blks_hit) / 
-     (sum(pg_stat_database_blks_hit) + sum(pg_stat_database_blks_read))) < 0.9
+     (sum(pg_stat_database_blks_hit) + sum(pg_stat_database_blks_read))) \< 0.9
   for: 30m
   labels:
     severity: P2
@@ -608,9 +608,9 @@ pg_stat_statements_calls{query=~".*FROM iot_sensor_data.*"}
 
  **1. 数据分层**:
 
- - 热数据(7天): 原始未压缩,查询 <100ms
- - 温数据(8-30天): 原生压缩(10x),查询 <500ms
- - 冷数据(31-90天): 降采样+压缩,查询 <1s
+ - 热数据(7天): 原始未压缩,查询 \<100ms
+ - 温数据(8-30天): 原生压缩(10x),查询 \<500ms
+ - 冷数据(31-90天): 降采样+压缩,查询 \<1s
  - 归档(90天): 仅保留聚合视图,永久保存
 
  **2. 性能优化**:
