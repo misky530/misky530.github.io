@@ -16,7 +16,7 @@ CREATE TABLE iot_sensor_data (
 
 -- 转换为 Hypertable(自动分区)
 SELECT create_hypertable('iot_sensor_data', 'time', 
-    chunk_time_interval => INTERVAL '1 day'  -- 每天一个分区
+    chunk_time_interval = INTERVAL '1 day'  -- 每天一个分区
 );
 
 -- 添加索引优化查询
@@ -56,15 +56,15 @@ WITH NO DATA;  -- 不立即填充数据
 
 -- 设置自动刷新策略(每 30 分钟更新一次)
 SELECT add_continuous_aggregate_policy('sensor_data_hourly',
-    start_offset => INTERVAL '3 hours',   -- 从 3 小时前开始
-    end_offset => INTERVAL '1 hour',      -- 到 1 小时前结束
-    schedule_interval => INTERVAL '30 minutes'  -- 每 30 分钟执行
+    start_offset = INTERVAL '3 hours',   -- 从 3 小时前开始
+    end_offset = INTERVAL '1 hour',      -- 到 1 小时前结束
+    schedule_interval = INTERVAL '30 minutes'  -- 每 30 分钟执行
 );
 
 -- 查询时直接用聚合视图(快 100 倍+)
 SELECT bucket, device_id, avg_temp
 FROM sensor_data_hourly
-WHERE bucket >= NOW() - INTERVAL '7 days'
+WHERE bucket = NOW() - INTERVAL '7 days'
   AND device_id = 'device_001'
 ORDER BY bucket DESC;
 ```
@@ -88,7 +88,7 @@ ORDER BY bucket DESC;
 | **热数据**   | 最近 7 天 | ✅ 保留     | 无压缩          | 高频     | 高       |
 | **温数据**   | 8-30 天   | ✅ 保留     | 原生压缩(2-20x) | 中频     | 中       |
 | **冷数据**   | 31-90 天  | ⚠️ 降采样   | 原生压缩 + 聚合 | 低频     | 低       |
-| **归档数据** | >90 天    | ❌ 删除原始 | 仅保留聚合视图  | 极少     | 极低     |
+| **归档数据** | 90 天    | ❌ 删除原始 | 仅保留聚合视图  | 极少     | 极低     |
 
 ------
 
@@ -149,9 +149,9 @@ GROUP BY bucket, device_id;
 
 -- 自动刷新
 SELECT add_continuous_aggregate_policy('sensor_data_1min',
-    start_offset => INTERVAL '3 hours',
-    end_offset => INTERVAL '1 minute',
-    schedule_interval => INTERVAL '1 hour'
+    start_offset = INTERVAL '3 hours',
+    end_offset = INTERVAL '1 minute',
+    schedule_interval = INTERVAL '1 hour'
 );
 ```
 
@@ -209,7 +209,7 @@ SELECT
     device_id,
     AVG(temperature) AS avg_temp
 FROM iot_sensor_data
-WHERE time > NOW() - INTERVAL '1 hour'
+WHERE time  NOW() - INTERVAL '1 hour'
   AND device_id IN ('device_001', 'device_002')
 GROUP BY bucket, device_id
 ORDER BY bucket DESC;
@@ -243,7 +243,7 @@ SELECT
     COUNT(DISTINCT device_id) AS device_count,
     AVG(temperature) AS avg_temp
 FROM iot_sensor_data
-WHERE time > NOW() - INTERVAL '7 days'
+WHERE time  NOW() - INTERVAL '7 days'
 GROUP BY bucket;
 
 -- 查看执行计划,确认使用了 Parallel Seq Scan
@@ -256,7 +256,7 @@ GROUP BY bucket;
 ```sql
 -- ✅ 正确:时间范围查询自动裁剪无关 Chunk
 SELECT * FROM iot_sensor_data
-WHERE time >= '2025-10-01' AND time < '2025-10-02';
+WHERE time = '2025-10-01' AND time < '2025-10-02';
 -- 只扫描 2025-10-01 的 Chunk
 
 -- ❌ 错误:不指定时间范围,全表扫描
@@ -269,7 +269,7 @@ LIMIT 100;
 -- ✅ 修正:加上时间范围
 SELECT * FROM iot_sensor_data
 WHERE device_id = 'device_001'
-  AND time > NOW() - INTERVAL '7 days'  -- 关键!
+  AND time  NOW() - INTERVAL '7 days'  -- 关键!
 ORDER BY time DESC
 LIMIT 100;
 ```
@@ -287,7 +287,7 @@ CREATE INDEX idx_time_device ON iot_sensor_data (time DESC, device_id);
 
 -- 主要查询模式 3: 特定指标范围查询
 CREATE INDEX idx_temp_time ON iot_sensor_data (temperature, time DESC)
-WHERE temperature > 100;  -- 部分索引,节省空间
+WHERE temperature  100;  -- 部分索引,节省空间
 
 -- 查看索引使用情况
 SELECT 
@@ -447,7 +447,7 @@ data:
     max_connections = 200
     
     # 日志
-    log_min_duration_statement = 1000  # 记录 >1s 的慢查询
+    log_min_duration_statement = 1000  # 记录 1s 的慢查询
     log_line_prefix = '%t [%p]: [%l-1] user=%u,db=%d,app=%a,client=%h '
     
     # 自动 VACUUM
@@ -463,7 +463,7 @@ data:
 ```bash
 # 方案 1: pg_dump 逻辑备份(小数据量)
 kubectl exec -n database timescaledb-0 -- \
-  pg_dump -U postgres -Fc iot_metrics > backup_$(date +%Y%m%d).dump
+  pg_dump -U postgres -Fc iot_metrics  backup_$(date +%Y%m%d).dump
 
 # 方案 2: 物理备份(推荐,TB 级数据)
 # 使用 pgBackRest 或 WAL-G
@@ -531,7 +531,7 @@ pg_stat_database_numbackends{datname="iot_metrics"}
 # 3. 事务速率
 rate(pg_stat_database_xact_commit{datname="iot_metrics"}[5m])
 
-# 4. 缓存命中率(应该 >95%)
+# 4. 缓存命中率(应该 95%)
 sum(pg_stat_database_blks_hit{datname="iot_metrics"}) / 
 (sum(pg_stat_database_blks_hit{datname="iot_metrics"}) + 
  sum(pg_stat_database_blks_read{datname="iot_metrics"}))
@@ -552,7 +552,7 @@ pg_stat_statements_calls{query=~".*FROM iot_sensor_data.*"}
 - alert: TimescaleDBDiskFull
   expr: |
     (pg_database_size_bytes / 
-     (node_filesystem_size_bytes{mountpoint="/var/lib/postgresql/data"})) > 0.8
+     (node_filesystem_size_bytes{mountpoint="/var/lib/postgresql/data"}))  0.8
   for: 10m
   labels:
     severity: P1
@@ -568,7 +568,7 @@ pg_stat_statements_calls{query=~".*FROM iot_sensor_data.*"}
 
 # 连接数过高
 - alert: HighDatabaseConnections
-  expr: pg_stat_database_numbackends > 180
+  expr: pg_stat_database_numbackends  180
   for: 5m
   labels:
     severity: P2
@@ -596,7 +596,7 @@ pg_stat_statements_calls{query=~".*FROM iot_sensor_data.*"}
 
 3. 30-90 天降采样(压缩 5x)
 
-4. > 90 天仅聚合视图
+4.  90 天仅聚合视图
 
 5. **总成本降低 80%+**
 
@@ -604,25 +604,25 @@ pg_stat_statements_calls{query=~".*FROM iot_sensor_data.*"}
 
 ## **面试标准答案模板**
 
-> **"我们使用 TimescaleDB 管理 TB 级时序数据,通过分层保留策略优化成本:**
->
-> **1. 数据分层**:
->
-> - 热数据(7天): 原始未压缩,查询 <100ms
-> - 温数据(8-30天): 原生压缩(10x),查询 <500ms
-> - 冷数据(31-90天): 降采样+压缩,查询 <1s
-> - 归档(>90天): 仅保留聚合视图,永久保存
->
-> **2. 性能优化**:
->
-> - 使用 time_bucket 和连续聚合,查询速度提升 100 倍
-> - 创建多级聚合视图(1分钟/1小时/1天)
-> - 索引策略匹配主要查询模式
-> - 并行查询处理大数据量聚合
->
-> **3. 成本优化**: 通过压缩和降采样,存储成本从 2.5 TB 降至 400 GB,**节省 84%**
->
-> **4. 运维保障**: K8s StatefulSet 部署,SSD 存储,物理备份,Prometheus 监控关键指标(DB 大小、缓存命中率、慢查询)"
+ **"我们使用 TimescaleDB 管理 TB 级时序数据,通过分层保留策略优化成本:**
+
+ **1. 数据分层**:
+
+ - 热数据(7天): 原始未压缩,查询 <100ms
+ - 温数据(8-30天): 原生压缩(10x),查询 <500ms
+ - 冷数据(31-90天): 降采样+压缩,查询 <1s
+ - 归档(90天): 仅保留聚合视图,永久保存
+
+ **2. 性能优化**:
+
+ - 使用 time_bucket 和连续聚合,查询速度提升 100 倍
+ - 创建多级聚合视图(1分钟/1小时/1天)
+ - 索引策略匹配主要查询模式
+ - 并行查询处理大数据量聚合
+
+ **3. 成本优化**: 通过压缩和降采样,存储成本从 2.5 TB 降至 400 GB,**节省 84%**
+
+ **4. 运维保障**: K8s StatefulSet 部署,SSD 存储,物理备份,Prometheus 监控关键指标(DB 大小、缓存命中率、慢查询)"
 
 ------
 
