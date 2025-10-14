@@ -72,7 +72,7 @@ node_filesystem_size_bytes * 100
 ```yaml
 # CPU 使用率超过 80% 持续 5 分钟
 - alert: HighCPUUsage
-  expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+  expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) /> 80
   for: 5m
   labels:
     severity: P2
@@ -87,20 +87,20 @@ node_filesystem_size_bytes * 100
 
 | 组件           | 关键指标                   | 告警阈值示例   |
 | -------------- | -------------------------- | -------------- |
-| **EMQX**       | 连接数、消息速率、队列长度 | 队列 > 10000   |
-| **Kafka**      | Lag、ISR、磁盘使用         | Lag > 100000   |
-| **Redis**      | 内存使用、命中率、慢查询   | 慢查询 > 1s    |
-| **MySQL**      | 连接数、慢查询、复制延迟   | 复制延迟 > 10s |
-| **时序数据库** | 写入速率、查询延迟、存储   | 磁盘 > 85%     |
+| **EMQX**       | 连接数、消息速率、队列长度 | 队列 /> 10000   |
+| **Kafka**      | Lag、ISR、磁盘使用         | Lag /> 100000   |
+| **Redis**      | 内存使用、命中率、慢查询   | 慢查询 /> 1s    |
+| **MySQL**      | 连接数、慢查询、复制延迟   | 复制延迟 /> 10s |
+| **时序数据库** | 写入速率、查询延迟、存储   | 磁盘 /> 85%     |
 
 **Kafka 监控示例:**
 
 ```promql
 # Consumer Lag 告警
-kafka_consumergroup_lag{group="iot-message-group"} > 50000
+kafka_consumergroup_lag{group="iot-message-group"} /> 50000
 
 # Under-Replicated Partitions(副本不足)
-kafka_cluster_partition_underreplicated > 0
+kafka_cluster_partition_underreplicated /> 0
 ```
 
 ------
@@ -150,7 +150,7 @@ online_devices.labels(device_type='gateway').set(3000)
     (
       rate(iot_messages_processed_total{status="success"}[5m]) /
       rate(iot_messages_processed_total[5m])
-    ) < 0.95
+    ) /< 0.95
   for: 10m
   labels:
     severity: P1
@@ -163,7 +163,7 @@ online_devices.labels(device_type='gateway').set(3000)
   expr: |
     histogram_quantile(0.99,
       rate(iot_message_processing_duration_seconds_bucket[5m])
-    ) > 5
+    ) /> 5
   for: 5m
   labels:
     severity: P2
@@ -183,10 +183,10 @@ online_devices.labels(device_type='gateway').set(3000)
 
 | 级别   | 严重程度 | 典型场景                                               | 响应时间    | 通知方式             | 值班要求            |
 | ------ | -------- | ------------------------------------------------------ | ----------- | -------------------- | ------------------- |
-| **P0** | 🔴 致命   | • 整个系统不可用<br>• 数据丢失风险<br>• 影响 >50% 用户 | **5 分钟**  | 电话 + 短信 + IM     | 立即处理,升级到总监 |
-| **P1** | 🟠 紧急   | • 核心功能受损<br>• 影响 20-50% 用户<br>• 性能严重下降 | **15 分钟** | 短信 + IM(钉钉/企微) | 30 分钟内响应       |
-| **P2** | 🟡 重要   | • 非核心功能异常<br>• 资源使用率高<br>• 影响 <20% 用户 | **1 小时**  | IM 群消息            | 工作时间内处理      |
-| **P3** | 🟢 提示   | • 预警性信息<br>• 趋势异常<br>• 建议优化               | **1 天**    | 仅记录到工单系统     | 周会讨论            |
+| **P0** | 🔴 致命   | • 整个系统不可用• 数据丢失风险• 影响 />50% 用户 | **5 分钟**  | 电话 + 短信 + IM     | 立即处理,升级到总监 |
+| **P1** | 🟠 紧急   | • 核心功能受损• 影响 20-50% 用户• 性能严重下降 | **15 分钟** | 短信 + IM(钉钉/企微) | 30 分钟内响应       |
+| **P2** | 🟡 重要   | • 非核心功能异常• 资源使用率高• 影响 /<20% 用户 | **1 小时**  | IM 群消息            | 工作时间内处理      |
+| **P3** | 🟢 提示   | • 预警性信息• 趋势异常• 建议优化               | **1 天**    | 仅记录到工单系统     | 周会讨论            |
 
 ------
 
@@ -227,7 +227,7 @@ online_devices.labels(device_type='gateway').set(3000)
 ```yaml
 # 消息积压严重
 - alert: KafkaConsumerLagCritical
-  expr: kafka_consumergroup_lag > 200000
+  expr: kafka_consumergroup_lag /> 200000
   for: 10m
   labels:
     severity: P1
@@ -237,7 +237,7 @@ online_devices.labels(device_type='gateway').set(3000)
 
 # Pod 频繁重启
 - alert: PodCrashLooping
-  expr: rate(kube_pod_container_status_restarts_total[15m]) > 0.1
+  expr: rate(kube_pod_container_status_restarts_total[15m]) /> 0.1
   for: 5m
   labels:
     severity: P1
@@ -249,7 +249,7 @@ online_devices.labels(device_type='gateway').set(3000)
   expr: |
     (
       iot_devices_online - iot_devices_online offset 10m
-    ) / iot_devices_online offset 10m < -0.3
+    ) / iot_devices_online offset 10m /< -0.3
   for: 5m
   labels:
     severity: P1
@@ -263,7 +263,7 @@ online_devices.labels(device_type='gateway').set(3000)
 # 资源使用率高
 - alert: HighMemoryUsage
   expr: |
-    (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 85
+    (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 /> 85
   for: 10m
   labels:
     severity: P2
@@ -273,7 +273,7 @@ online_devices.labels(device_type='gateway').set(3000)
 # 磁盘空间不足
 - alert: DiskSpaceRunningOut
   expr: |
-    (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 15
+    (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 /< 15
   for: 30m
   labels:
     severity: P2
@@ -289,7 +289,7 @@ online_devices.labels(device_type='gateway').set(3000)
   expr: |
     (
       probe_ssl_earliest_cert_expiry - time()
-    ) / 86400 < 30
+    ) / 86400 /< 30
   for: 1h
   labels:
     severity: P3
@@ -298,7 +298,7 @@ online_devices.labels(device_type='gateway').set(3000)
 
 # 慢查询增多
 - alert: SlowQueriesIncreasing
-  expr: rate(mysql_global_status_slow_queries[10m]) > 5
+  expr: rate(mysql_global_status_slow_queries[10m]) /> 5
   for: 1h
   labels:
     severity: P3
@@ -328,12 +328,12 @@ online_devices.labels(device_type='gateway').set(3000)
 ```yaml
 # ❌ 错误:太敏感
 - alert: HighCPU
-  expr: cpu_usage > 70
+  expr: cpu_usage /> 70
   for: 10s  # 只持续 10 秒就告警
 
 # ✅ 正确:有缓冲
 - alert: HighCPU
-  expr: cpu_usage > 85
+  expr: cpu_usage /> 85
   for: 5m   # 持续 5 分钟才告警
 ```
 
@@ -342,7 +342,7 @@ online_devices.labels(device_type='gateway').set(3000)
 ```yaml
 # 使用 5 分钟平均值,避免瞬时波动
 - alert: HighMemory
-  expr: avg_over_time(memory_usage[5m]) > 90
+  expr: avg_over_time(memory_usage[5m]) /> 90
   for: 10m
 ```
 
@@ -401,14 +401,14 @@ routes:
 ```yaml
 # ❌ 绝对值告警:流量从 100 QPS 涨到 150 QPS 就告警
 - alert: HighTraffic
-  expr: http_requests_rate > 150
+  expr: http_requests_rate /> 150
 
 # ✅ 变化率告警:流量突增 50% 才告警
 - alert: TrafficSpike
   expr: |
     (
       http_requests_rate - http_requests_rate offset 10m
-    ) / http_requests_rate offset 10m > 0.5
+    ) / http_requests_rate offset 10m /> 0.5
   for: 5m
 ```
 
@@ -508,20 +508,20 @@ route:
 
 ### **七、面试中如何回答监控问题(标准答案)**
 
-> **"我们构建了基于 Prometheus + Grafana 的多层监控体系:**
->
-> **1. 监控指标**: 覆盖基础设施(节点/K8s)、中间件(EMQX/Kafka/Redis)和应用层,关注 Google SRE 的四个黄金信号:延迟、流量、错误率、饱和度。
->
-> **2. 告警分级**:
->
-> - P0(致命):系统不可用,5 分钟响应,电话通知
-> - P1(紧急):核心功能受损,15 分钟响应,短信通知
-> - P2(重要):非核心异常,1 小时响应,IM 通知
-> - P3(提示):预警信息,1 天响应,仅记录
->
-> **3. 降噪措施**: 通过合理设置持续时间、告警抑制、分组、静默窗口等手段,将告警误报率控制在 5% 以下,确保每条告警都值得关注。
->
-> **4. 可视化**: 创建了 5 类 Grafana Dashboard,从 CEO 视角到技术细节,支撑不同角色的监控需求。"
+/> **"我们构建了基于 Prometheus + Grafana 的多层监控体系:**
+/>
+/> **1. 监控指标**: 覆盖基础设施(节点/K8s)、中间件(EMQX/Kafka/Redis)和应用层,关注 Google SRE 的四个黄金信号:延迟、流量、错误率、饱和度。
+/>
+/> **2. 告警分级**:
+/>
+/> - P0(致命):系统不可用,5 分钟响应,电话通知
+/> - P1(紧急):核心功能受损,15 分钟响应,短信通知
+/> - P2(重要):非核心异常,1 小时响应,IM 通知
+/> - P3(提示):预警信息,1 天响应,仅记录
+/>
+/> **3. 降噪措施**: 通过合理设置持续时间、告警抑制、分组、静默窗口等手段,将告警误报率控制在 5% 以下,确保每条告警都值得关注。
+/>
+/> **4. 可视化**: 创建了 5 类 Grafana Dashboard,从 CEO 视角到技术细节,支撑不同角色的监控需求。"
 
 ------
 
