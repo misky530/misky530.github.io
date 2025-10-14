@@ -235,7 +235,7 @@ spec:
             - /bin/sh
             - -c
             - |
-              cat <<EOF | kubectl apply -f -
+              cat /</<EOF | kubectl apply -f -
               apiVersion: snapshot.storage.k8s.io/v1
               kind: VolumeSnapshot
               metadata:
@@ -402,7 +402,7 @@ aws s3 cp s3://backups/mysql-20250108.sql.gz .
 kubectl scale statefulset mysql --replicas=0
 
 # 3. 恢复数据
-gunzip < mysql-20250108.sql.gz | \
+gunzip /< mysql-20250108.sql.gz | \
   kubectl exec -i mysql-0 -- mysql
 
 # 4. 验证数据
@@ -893,7 +893,7 @@ spec:
 **性能对比:**
 
 ```
-本地NVMe:   >3,000 MB/s,  延迟 <100μs
+本地NVMe:   >3,000 MB/s,  延迟 /<100μs
 EBS io2:    ~1,000 MB/s,  延迟 ~1ms
 EFS:        ~300 MB/s,    延迟 ~10ms
 
@@ -909,7 +909,7 @@ EFS:      333秒
 
 **需求特征:**
 
-- 极低延迟(<1ms)
+- 极低延迟(/<1ms)
 - 高IOPS
 - 数据可丢失(有持久化可选)
 
@@ -996,9 +996,9 @@ reclaimPolicy: Delete
 
 ```markdown
 ✅ 性能需求
-- [ ] IOPS需求是多少? (<1000, 1000-5000, >5000)
-- [ ] 吞吐量需求? (<100MB/s, 100-500MB/s, >500MB/s)
-- [ ] 延迟容忍度? (<1ms, 1-10ms, >10ms)
+- [ ] IOPS需求是多少? (/<1000, 1000-5000, >5000)
+- [ ] 吞吐量需求? (/<100MB/s, 100-500MB/s, >500MB/s)
+- [ ] 延迟容忍度? (/<1ms, 1-10ms, >10ms)
 
 ✅ 访问模式
 - [ ] 单节点访问 (RWO) 还是多节点 (RWX)?
@@ -1203,10 +1203,10 @@ AI训练(按需):
 │ 应用类型     │ 存储类型     │ 性能要求     │ 月成本(TB) │
 ├──────────────┼──────────────┼──────────────┼────────────┤
 │ 核心数据库   │ io2/ESSD-PL3│ >10k IOPS    │ $125+      │
-│ MySQL/PG     │              │ <1ms延迟     │            │
+│ MySQL/PG     │              │ /<1ms延迟     │            │
 ├──────────────┼──────────────┼──────────────┼────────────┤
 │ 缓存系统     │ emptyDir/io2│ >50k IOPS    │ $0/$125    │
-│ Redis        │              │ <0.1ms延迟   │            │
+│ Redis        │              │ /<0.1ms延迟   │            │
 ├──────────────┼──────────────┼──────────────┼────────────┤
 │ 分析数据库   │ gp3/ESSD-PL1│ 3k-10k IOPS  │ $80        │
 │ ES/ClickHouse│              │ 高吞吐       │            │
@@ -1252,7 +1252,7 @@ AI训练(按需):
 技术语言 → 业务语言
 
 "需要io2,IOPS 10000"  
-→ "这能保证订单处理延迟<100ms,双11不宕机"
+→ "这能保证订单处理延迟/<100ms,双11不宕机"
 
 "日志用st1就够了"
 → "每年能节省$50k,这些钱能招2个实习生"
